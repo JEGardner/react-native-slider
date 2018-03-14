@@ -167,6 +167,11 @@ export default class Slider extends PureComponent {
      * Used to configure the animation parameters.  These are the same parameters in the Animated library.
      */
     animationConfig : PropTypes.object,
+
+    /**
+     * Used to wrap thumb view in another component, or to replace it with a custom view .
+     */
+    createThumbMiddleware : PropTypes.func,
   };
 
   static defaultProps = {
@@ -213,6 +218,11 @@ export default class Slider extends PureComponent {
         this._setCurrentValue(newValue);
       }
     }
+  };
+
+   _createWrappedThumbView(view) {
+    const { createThumbMiddleware } = this.props;
+    return createThumbMiddleware ? createThumbMiddleware(view) : view;
   };
 
   render() {
@@ -264,7 +274,6 @@ export default class Slider extends PureComponent {
           onLayout={this._measureThumb}
           renderToHardwareTextureAndroid={true}
           style={[
-            {backgroundColor: thumbTintColor},
             mainStyles.thumb, thumbStyle,
             {
               transform: [
@@ -275,7 +284,13 @@ export default class Slider extends PureComponent {
             }
           ]}
         >
-          {this._renderThumbImage()}
+          {this._createWrappedThumbView(<View
+            style={[
+              {backgroundColor: thumbTintColor},
+              mainStyles.thumb,
+              thumbStyle,
+            ]}
+          />)}
         </Animated.View>
         <View
           renderToHardwareTextureAndroid={true}
